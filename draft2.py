@@ -127,8 +127,36 @@ mineral_count = (
 print(mineral_count.head(13))
 
 
+
 # --- Permitting length  ---
-# per counties?
+
+# --- From application to decision ---
+print("----- Application → decision (years) -----")
+df_col_ok["appl_to_dec"] = (df_col_ok["properties.dec_date"] - df_col_ok["properties.appl_date"]).dt.days / 365.25
+print(df_col_ok["appl_to_dec"].describe().round(2))
+
+# --- Permit duration (from to to) & stats ---
+print("----- Permit duration (years) -----")
+df_col_ok["permit_duration"] = (df_col_ok["properties.validto"] - df_col_ok["properties.validfrom"]).dt.days / 365.25
+print(df_col_ok["permit_duration"].describe().round(2))
+
+
+# --- Permit duration by county ---
+print("----- Avg permit duration by county (years) -----")
+print(df_col_ok.groupby("properties.county")["permit_duration"].mean().round(2).sort_values(ascending=False))
+
 
 # --- Counties Vs Minerals ---
+print("----- Minerals by county -----")
+mineral_by_county = (
+    df_col_ok[["properties.mineral", "properties.county"]]
+    .assign(mineral=df_col_ok["properties.mineral"].str.split(", "))
+    .explode("mineral")
+    .assign(mineral=lambda x: x["mineral"].str.strip())
+    .groupby(["properties.county", "mineral"])
+    .size()
+    .reset_index(name="count")
+    .sort_values("count", ascending=False)
+)
+print(mineral_by_county.head(20))
 
