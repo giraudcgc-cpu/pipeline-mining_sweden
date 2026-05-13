@@ -127,6 +127,10 @@ mineral_count = (
 print(mineral_count.head(13))
 
 
+# --- Date conversion ---
+date_cols = ["properties.appl_date", "properties.dec_date", "properties.validfrom", "properties.validto"]
+df_col_ok[date_cols] = df_col_ok[date_cols].apply(pd.to_datetime)
+
 
 # --- Permitting length  ---
 
